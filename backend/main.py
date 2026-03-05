@@ -189,7 +189,7 @@ def build_excel(req: GenerateRequest) -> bytes:
     for col, w in {"A":2,"B":28,"C":16,"D":10,"E":14,"F":11,"G":16,"H":13,"I":18}.items():
         ws.column_dimensions[col].width = w
     for r, h in {1:8,2:34,3:4,4:8,5:16,6:16,7:16,8:16,9:16,10:22,
-                 11:8,12:16,13:28,14:16,15:28,16:16,17:22,18:6}.items():
+                 11:16,12:16,13:28,14:16,15:28,16:16,17:22,18:6}.items():
         ws.row_dimensions[r].height = h
     for r in range(19, 19 + len(lignes) + 15):
         ws.row_dimensions[r].height = 24
@@ -217,13 +217,13 @@ def build_excel(req: GenerateRequest) -> bytes:
     ws["I8"] = f"S{week_num}"; ws["I8"].font = fnt(bold=True, size=10); ws["I8"].fill = fill(GREY_BG); ws["I8"].alignment = aln("center")
 
     # Sections client
-    ws["B10"] = "Facturer à :"; ws["B10"].font = fnt(bold=True,size=10,color=WHITE); ws["B10"].fill = fill(DARK_BG)
+    ws.merge_cells("B10:C10");ws["B10"] = "Facturer à :"; ws["B10"].font = fnt(bold=True,size=10,color=WHITE); ws["B10"].fill = fill(DARK_BG)
     ws.merge_cells("G10:I10"); ws["G10"] = "Facturé au client :"; ws["G10"].font = fnt(bold=True,size=10,color=WHITE); ws["G10"].fill = fill(DARK_BG)
     d1 = lignes[0].date_str if lignes else ""; d2 = lignes[-1].date_str if lignes else ""
-    ws["B13"] = "Date des prestations effectuées :"; ws["B14"] = f"Du {d1} au {d2}"
-    for row, label, value in [(12,"Nom",client_nom),(13,"Adresse",req.client_adresse),
-                               (14,"CP/Ville",req.client_cp_ville),(15,"Email",req.client_email),
-                               (16,"SIRET",req.client_siret)]:
+    ws["B11"] = "Date des prestations effectuées :"; ws["B12"] = f"Du {d1} au {d2}"
+    for row, label, value in [(11,"Nom",client_nom),(12,"Adresse",req.client_adresse),
+                               (13,"CP/Ville",req.client_cp_ville),(14,"Email",req.client_email),
+                               (15,"SIRET",req.client_siret)]:
         ws["G"+str(row)] = label; ws["G"+str(row)].font = fnt(size=10)
         ws["I"+str(row)] = value; ws["I"+str(row)].font = fnt(size=10); ws["I"+str(row)].fill = fill(GREY_BG)
 
@@ -268,8 +268,7 @@ def build_excel(req: GenerateRequest) -> bytes:
     ws[f"H{r_somme}"] = f"=I{r_ht}+I{r_tva}"
     ws[f"H{r_somme}"].font = Font(name="Arial",bold=True,size=14,color=BLUE)
     ws[f"H{r_somme}"].number_format = EUR; ws[f"H{r_somme}"].fill = fill(GREY_BG); ws[f"H{r_somme}"].alignment = aln("center")
-    ws[f"H{r_somme}"].border = Border(top=Side(border_style="medium",color=BLUE),bottom=Side(border_style="medium",color=BLUE),
-                                      left=Side(border_style="medium",color=BLUE),right=Side(border_style="medium",color=BLUE))
+
     ech = facture_date + timedelta(days=14)
     ws[f"B{r_somme}"] = f"Date d'échéance : {ech.strftime('%d/%m/%Y')}"
     ws[f"B{r_somme}"].font = fnt(bold=True, size=10)
