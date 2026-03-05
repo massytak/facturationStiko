@@ -38,6 +38,7 @@ class LigneTransport(BaseModel):
     commande: str
     container: str
     quantite: int
+    pu: int = 0
     immob: float
     total_ht: float
     tva: float
@@ -87,7 +88,7 @@ def parse_pdf_text(text: str) -> list[dict]:
         r"\s+([A-Z]{4}\d{5,8})"
         r"\s+.+?"
         r"\s+(\d{1,5}),00"     # QTE (jusqu'à 5 chiffres)
-        r"\s+\d{1,4},00"       # PU (ignoré)
+        r"\s+(\d{1,4}),00"     # PU (capturé)      # PU 
         r"\s+[\d]+,\d{2}"      # montant ligne (ignoré)
         r"\s+(\d)\b"           # code TVA : 0=exo 4=20%
     )
@@ -119,7 +120,8 @@ def parse_pdf_text(text: str) -> list[dict]:
             "cmd":      re.sub(r"\s+", " ", m.group(2)).strip(),
             "ctr":      m.group(3),
             "qte":      int(m.group(4)),
-            "tva_code": m.group(5),
+            "pu":       int(m.group(5)),
+            "tva_code": m.group(6),
         })
 
     results = []
@@ -145,6 +147,7 @@ def parse_pdf_text(text: str) -> list[dict]:
             "commande":  match["cmd"],
             "container": match["ctr"],
             "quantite":  match["qte"],
+            "pu":        match["pu"],
             "immob":     immob,
             "total_ht":  total_ht,
             "tva":       tva,
@@ -249,7 +252,7 @@ def build_excel(req: GenerateRequest) -> bytes:
         ws[f"D{r}"] = ligne.quantite; ws[f"D{r}"].font = fnt(size=10); ws[f"D{r}"].fill = fill(GREY_BG); ws[f"D{r}"].alignment = aln("center"); ws[f"D{r}"].border = bdr()
         ws[f"E{r}"] = ligne.immob; ws[f"E{r}"].number_format = EUR; ws[f"E{r}"].font = fnt(size=10); ws[f"E{r}"].fill = fill(GREY_BG); ws[f"E{r}"].border = bdr()
         ws[f"F{r}"] = 0; ws[f"F{r}"].font = fnt(size=10); ws[f"F{r}"].fill = fill(GREY_BG); ws[f"F{r}"].border = bdr()
-        ws[f"G{r}"] = "forfait"; ws[f"G{r}"].font = fnt(bold=True,size=10); ws[f"G{r}"].fill = fill(GREY_BG); ws[f"G{r}"].alignment = aln("center"); ws[f"G{r}"].border = bdr()
+        ws[f"G{r}"] = "forfait" if ligne.pu == 0 else ligne.pu; ws[f"G{r}"].font = fnt(bold=True,size=10); ws[f"G{r}"].fill = fill(GREY_BG); ws[f"G{r}"].alignment = aln("center"); ws[f"G{r}"].border = bdr()
         ws[f"H{r}"] = f"=I{r}*0.2" if not ligne.is_exo else 0
         ws[f"H{r}"].font = fnt(size=10); ws[f"H{r}"].fill = fill(GREY_BG); ws[f"H{r}"].number_format = EUR; ws[f"H{r}"].alignment = aln("right"); ws[f"H{r}"].border = bdr()
         ws[f"I{r}"] = ligne.total_ht; ws[f"I{r}"].font = fnt(size=10); ws[f"I{r}"].fill = fill(GREY_BG); ws[f"I{r}"].number_format = EUR; ws[f"I{r}"].alignment = aln("right"); ws[f"I{r}"].border = bdr()
