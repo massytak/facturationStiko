@@ -376,15 +376,7 @@ async def generate_excel(req: GenerateRequest):
     )
 
 # Après toutes tes routes API, ajoute en bas :
-frontend_path = os.path.join(os.path.dirname(__file__), "../frontend/dist")
 
-if os.path.exists(frontend_path):
-    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
-
-    @app.exception_handler(404)
-    async def not_found(request, exc):
-        return FileResponse(os.path.join(frontend_path, "index.html"))
-    
 frontend_dist = os.path.join(os.path.dirname(__file__), "../frontend/dist")
 
 if os.path.exists(frontend_dist):
