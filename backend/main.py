@@ -249,7 +249,7 @@ def build_excel(req: GenerateRequest) -> bytes:
         ws[f"D{r}"] = ligne.quantite; ws[f"D{r}"].font = fnt(size=10); ws[f"D{r}"].fill = fill(GREY_BG); ws[f"D{r}"].alignment = aln("center"); ws[f"D{r}"].border = bdr()
         ws[f"E{r}"] = ligne.immob; ws[f"E{r}"].number_format = EUR; ws[f"E{r}"].font = fnt(size=10); ws[f"E{r}"].fill = fill(GREY_BG); ws[f"E{r}"].border = bdr()
         ws[f"F{r}"] = 0; ws[f"F{r}"].font = fnt(size=10); ws[f"F{r}"].fill = fill(GREY_BG); ws[f"F{r}"].border = bdr()
-        ws[f"G{r}"] = "forfait" if ligne.pu == 0 else ligne.pu; ws[f"G{r}"].font = fnt(bold=True,size=10); ws[f"G{r}"].fill = fill(GREY_BG); ws[f"G{r}"].alignment = aln("center"); ws[f"G{r}"].border = bdr()
+        ws[f"G{r}"] = "forfait"; ws[f"G{r}"].font = fnt(bold=True,size=10); ws[f"G{r}"].fill = fill(GREY_BG); ws[f"G{r}"].alignment = aln("center"); ws[f"G{r}"].border = bdr()
         ws[f"H{r}"] = f"=I{r}*0.2" if not ligne.is_exo else 0
         ws[f"H{r}"].font = fnt(size=10); ws[f"H{r}"].fill = fill(GREY_BG); ws[f"H{r}"].number_format = EUR; ws[f"H{r}"].alignment = aln("right"); ws[f"H{r}"].border = bdr()
         ws[f"I{r}"] = ligne.total_ht; ws[f"I{r}"].font = fnt(size=10); ws[f"I{r}"].fill = fill(GREY_BG); ws[f"I{r}"].number_format = EUR; ws[f"I{r}"].alignment = aln("right"); ws[f"I{r}"].border = bdr()
@@ -281,6 +281,20 @@ def build_excel(req: GenerateRequest) -> bytes:
     ws[f"B{r_foot}"] = "SIREN 980977987 | NAF 49.41B | TVA FR48980977987"
     ws[f"B{r_foot}"].font = fnt(size=8,color="FF888888"); ws[f"B{r_foot}"].alignment = aln("center")
 
+# ── Auto-ajustement de la largeur de toutes les colonnes
+    for col in ws.columns:
+        max_len = 0
+        col_letter = col[0].column_letter
+        for cell in col:
+            if cell.value:
+                try:
+                    max_len = max(max_len, len(str(cell.value)))
+                except:
+                    pass
+        if col_letter == "B":
+            ws.column_dimensions["B"].width = 17   # ← largeur fixe pour B
+        else:
+            ws.column_dimensions[col_letter].width = max_len + 4
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
