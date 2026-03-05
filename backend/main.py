@@ -384,3 +384,8 @@ if os.path.exists(frontend_path):
     @app.exception_handler(404)
     async def not_found(request, exc):
         return FileResponse(os.path.join(frontend_path, "index.html"))
+    
+frontend_dist = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="static")
