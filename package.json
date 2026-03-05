@@ -2,6 +2,6 @@
   "name": "stiko-trans",
   "version": "1.0.0",
   "scripts": {
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "heroku-postbuild": "npm install --prefix frontend && npm run build --prefix frontend"
   }
 }
