@@ -244,8 +244,8 @@ def build_excel(req: GenerateRequest) -> bytes:
             date_obj = datetime(int(dp[2]), int(dp[1]), int(dp[0]))
         except Exception:
             date_obj = facture_date
-        ws[f"B{r}"] = date_obj; ws[f"B{r}"].number_format = "DD/MM/YYYY"; ws[f"B{r}"].font = fnt(size=10); ws[f"B{r}"].fill = fill(GREY_BG); ws[f"B{r}"].border = bdr()
-        ws[f"C{r}"] = ligne.commande; ws[f"C{r}"].font = fnt(size=10); ws[f"C{r}"].fill = fill(GREY_BG); ws[f"C{r}"].border = bdr()
+        ws[f"B{r}"] = date_obj; ws[f"B{r}"].number_format = "DD/MM/YYYY"; ws[f"B{r}"].font = fnt(size=10); ws[f"B{r}"].fill = fill(GREY_BG); ws[f"B{r}"].border = bdr(); ws[f"B{r}"].alignment = aln("center")
+        ws[f"C{r}"] = ligne.commande; ws[f"C{r}"].font = fnt(size=10); ws[f"C{r}"].fill = fill(GREY_BG); ws[f"C{r}"].border = bdr(); ws[f"C{r}"].alignment = aln("center")
         ws[f"D{r}"] = ligne.quantite; ws[f"D{r}"].font = fnt(size=10); ws[f"D{r}"].fill = fill(GREY_BG); ws[f"D{r}"].alignment = aln("center"); ws[f"D{r}"].border = bdr()
         ws[f"E{r}"] = ligne.immob; ws[f"E{r}"].number_format = EUR; ws[f"E{r}"].font = fnt(size=10); ws[f"E{r}"].fill = fill(GREY_BG); ws[f"E{r}"].border = bdr()
         ws[f"F{r}"] = 0; ws[f"F{r}"].font = fnt(size=10); ws[f"F{r}"].fill = fill(GREY_BG); ws[f"F{r}"].border = bdr()
