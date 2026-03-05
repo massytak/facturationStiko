@@ -6,11 +6,13 @@ Endpoints :
   POST /api/generate-excel → génère le fichier Excel facture
 """
 
+import os
 import re
 import io
 from datetime import datetime, timedelta
 from typing import Optional
-
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import pdfplumber
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -372,3 +374,13 @@ async def generate_excel(req: GenerateRequest):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": f"attachment; filename={fname}"}
     )
+
+# Après toutes tes routes API, ajoute en bas :
+frontend_path = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
+
+    @app.exception_handler(404)
+    async def not_found(request, exc):
+        return FileResponse(os.path.join(frontend_path, "index.html"))

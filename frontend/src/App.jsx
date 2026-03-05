@@ -3,7 +3,9 @@ import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import "./App.css";
 
-const API = "http://localhost:8000";
+const API = process.env.NODE_ENV === "production" 
+  ? ""           // même domaine en prod — pas besoin d'URL complète
+  : "http://localhost:8000"
 
 // ── Helpers
 const euro = (n) =>
