@@ -309,7 +309,12 @@ def build_excel(req: GenerateRequest) -> bytes:
 # ROUTES
 # ──────────────────────────────────────────────
 
-@app.get("/")
+# @app.get("/")
+# def root():
+#     return {"status": "ok", "service": "STIKO TRANS API v1.0"}
+
+# APRÈS — renomme-la en /api/health par exemple
+@app.get("/api/health")
 def root():
     return {"status": "ok", "service": "STIKO TRANS API v1.0"}
 
